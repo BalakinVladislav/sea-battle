@@ -1,0 +1,96 @@
+.battleship {
+    margin: 0 auto;
+}
+
+.battleship__header {
+    text-align: center;
+    font-size: 30px;
+    color: purple;
+}
+
+.battleship__main {
+    margin: 0 auto;
+    width: 700px;
+    height: 320px;
+    border: 1px solid gray;
+    display: flex;
+    justify-content: space-between;
+}
+
+.battleship__replace-text {
+    background-color: darkolivegreen;
+}
+
+.battleship__main-user {
+    width: 320px;
+    height: 320px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.battleship__main-ai {
+    width: 320px;
+    height: 320px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.battleship__main-ai div {
+    width: 30px;
+    height: 30px;
+    border: 1px solid brown;
+}
+
+
+.battleship__main-user div {
+    width: 30px;
+    height: 30px;
+    border: 1px solid brown;
+}
+
+.battleship__helpText {
+    text-align: center;
+    font-size: 25px;
+    margin: 30px 0;
+}
+
+.battleship__btn {
+    margin: 20px 0;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.battleship__start-text {
+    background-color: brown;
+}
+
+.battleship__newgame-text {
+    background-color: lightcoral;
+}
+
+.btn {
+    padding: 5px;
+    cursor: pointer;
+    line-height: 30px;
+    text-align: center;
+    height: 100%;
+    display: inline-block;
+    border-radius: 10px;
+}
+
+.btn:hover {
+    box-shadow: 7px 4px 12px 4px rgb(84, 84, 84);;
+}
+
+.ship {
+    background-color: blue;
+}
+
+.mistake {
+    background-color: blueviolet;
+}
+.kill {
+    background-color: firebrick;
+}
