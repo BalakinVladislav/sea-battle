@@ -12,7 +12,7 @@
 .battleship__main {
     margin: 0 auto;
     width: 700px;
-    border-radius: 20px;
+    border-radius: 10px;
     height: 360px;
     display: flex;
     box-shadow: 0px 0px 99px 9px rgba(135,133,135,1);
@@ -20,32 +20,14 @@
     align-items: center
 }
 
-.battleship__replace-text {
-    background-color: darkolivegreen;
-}
-
-.battleship__main-user {
+.battleship__main-field {
     width: 320px;
     height: 320px;
     display: flex;
     flex-wrap: wrap;
 }
 
-.battleship__main-ai {
-    width: 320px;
-    height: 320px;
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.battleship__main-ai div {
-    width: 30px;
-    height: 30px;
-    border: 1px solid brown;
-}
-
-
-.battleship__main-user div {
+.battleship__main-field div {
     width: 30px;
     height: 30px;
     border: 1px solid brown;
@@ -63,6 +45,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.battleship__replace-text {
+    background-color: darkolivegreen;
 }
 
 .battleship__start-text {
@@ -101,4 +87,12 @@
 }
 .kill {
     background-color: firebrick;
+}
+
+@media screen and (max-width: 769px) {
+    .battleship__main {
+        flex-direction: column;
+        height: 700px;
+        width: 350px;
+    }
 }
