@@ -357,7 +357,8 @@ window.onload = function() {
                 var field = getElement(name);
                 var cell = document.createElement('div');
                 var indClass = (i) + '-' + (j);
-                cell.className = 'cell ' + indClass;
+                var hoverClass = name === 'ai-field' ? 'usercell ' : 'cell ';
+                cell.className = hoverClass + indClass;
                 field.appendChild(cell);
             }
         }
