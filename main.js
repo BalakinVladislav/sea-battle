@@ -163,7 +163,7 @@ window.onload = function() {
             shot: function (e) {
                 // в зависимости от того кто совершил выстрел, получаем координаты выстрела
                 if (shooter === user) {
-                    coordinates = e.target.className.match(/ (.+)/)[1].split('-').map(element => parseInt(element));
+                    coordinates = e.target.className.match(/ (.+)/)[1].split('-').map(function (element) {parseInt(element)});
                 } else {
                     coordinates = self.getAiCoordinates();
                 }
@@ -317,15 +317,15 @@ window.onload = function() {
                 var around = filterCoordinates([[x+1,y], [x-1,y], [x, y+1], [x, y-1]]);
                 // оставляем в соседних координатах только те в которых может находиться корабль
                 if (shooter === ai)
-                shooter.aroundCoordinates = [...shooter.aroundCoordinates, ...around].filter(i =>
-                    enemy.fieldMatrix[i[0]][i[1]] === 0 || enemy.fieldMatrix[i[0]][i[1]] === 1);
+                shooter.aroundCoordinates = [...shooter.aroundCoordinates, ...around].filter(function (i) {
+                    enemy.fieldMatrix[i[0]][i[1]] === 0 || enemy.fieldMatrix[i[0]][i[1]] === 1});
             },
             deleteDiagonaleCoordinates: function(x,y) {
                 // удаляем из всех матриц диагональные координаты,
                 // в которых точно не может находиться палуба и отмечаем эти клетки как проверенные
                 // (когда бьет пользователь соответственно не нужно работать ни с какими массивами)
                 var diag = filterCoordinates([[x+1,y+1], [x-1,y-1], [x-1, y+1], [x+1, y-1]]);
-                diag.forEach(i => {
+                diag.forEach(function (i) {
                     if (shooter === ai) {
                         self.deleteExtraCoordinates(ai.optimalCoordinates,
                             {
@@ -415,7 +415,7 @@ window.onload = function() {
 
     function filterCoordinates(arr) {
         // вспомогательная функция убирающая координаты вышедшие за пределы игрового поля
-        return arr.filter(coord => coord[0] >=0 && coord[0] < 10 && coord[1] >= 0 && coord[1] < 10);
+        return arr.filter(function (coord) { coord[0] >=0 && coord[0] < 10 && coord[1] >= 0 && coord[1] < 10});
     }
 
     function getRandom(n) {
