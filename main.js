@@ -167,8 +167,8 @@ window.onload = function() {
                 } else {
                     coordinates = self.getAiCoordinates();
                 }
-                let x, y;
-                 [x, y] = coordinates;
+                var x = coordinates[0];
+                var y = coordinates[1];
                 // получаем значение по координатам выстрела
                 var fieldValue = enemy.fieldMatrix[x][y];
 
@@ -299,8 +299,9 @@ window.onload = function() {
                     ai.optimalCoordinates.length > 0 ?
                         ai.optimalCoordinates.pop() :
                         ai.allCoordinates.pop();
-
-                var [x, y] = nextCoordinates;
+                var x = nextCoordinates[0];
+                var y = nextCoordinates[1];
+                //var [x, y] = nextCoordinates;
                 var obj = {
                     x: x,
                     y: y
