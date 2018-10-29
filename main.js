@@ -19,22 +19,22 @@ window.onload = function() {
     Battlefield.prototype.placeShips = function () {
         this.fieldMatrix = createPureField(this.field);
 
-        for (var i = 1, length = this.shipsData.length; i < length; i++) {
-            // i равно количеству кораблей для данного типа корабля
+        for (var shipsAmountOfType = 1, length = this.shipsData.length; shipsAmountOfType < length; shipsAmountOfType++) {
+            // shipsAmountOfType равно количеству кораблей для данного типа корабля
 
-            var shipLength = this.shipsData[i][0]; // кол-во палуб
-            for (var j = 0; j < i; j++) {
+            var shipLength = this.shipsData[shipsAmountOfType][0]; // кол-во палуб
+            for (var j = 0; j < shipsAmountOfType; j++) {
                 // получаем координаты первой палубы и направление расположения
-                var fc = this.shipLocation(shipLength);
-                var k =0;
+                var shipInfo = this.shipLocation(shipLength);
+                var k =0; // счетчик палуб корабля
                 while (k < shipLength) {
                     // записываем координаты корабля в матрицу игрового поля
                     // kx и ky определяет направление расположения корабля
-                    this.fieldMatrix[fc.x + k * fc.kx][fc.y + k * fc.ky] = 1;
+                    this.fieldMatrix[shipInfo.x + k * shipInfo.kx][shipInfo.y + k * shipInfo.ky] = 1;
                     // Для поля юзера отобразим положение кораблей
                     if (this.field === 'user-field') {
-                        var square = getElementByClass((fc.x + k * fc.kx).toString() +
-                            '-' + (fc.y + k * fc.ky).toString());
+                        var square = getElementByClass((shipInfo.x + k * shipInfo.kx).toString() +
+                            '-' + (shipInfo.y + k * shipInfo.ky).toString(), 0);
                         square.classList.add('ship')
                     }
                     k++;
@@ -143,7 +143,7 @@ window.onload = function() {
             shot: function (e) {
                 // в зависимости от того кто совершил выстрел, получаем координаты выстрела
                 if (shooter === user) {
-                    coordinates = e.target.className.match(/ (.+)/)[1].split('-');
+                    coordinates = e.target.className.match(/ (.+)/)[1].split('-').map(element => parseInt(element));
                 } else {
                     coordinates = self.getAiCoordinates();
                 }
@@ -174,7 +174,7 @@ window.onload = function() {
                             }, 500);
                         } else {
                             // следующий выстрел делает игрок, добавляем возможность совершить выстрел
-                            var square = getElementByClass((x) + '-' + (y));
+                            var square = getElementByClass((x) + '-' + (y),0);
                             square.classList.add('mistake');
                             aiField.addEventListener('click', self.shot)
                         }
@@ -188,6 +188,7 @@ window.onload = function() {
 
                         if (shooter === user) {
                             e.target.classList.add('kill')
+                            self.deleteDiagonaleCoordinates(x,y);
                             self.showTextHelper('Вы попали, ваш выстрел')
                             if (shooter.points === 20) {
                                 shooter === user ?
@@ -196,7 +197,7 @@ window.onload = function() {
                                 return;
                             }
                         } else {
-                            var square = getElementByClass((x) + '-' + (y));
+                            var square = getElementByClass((x) + '-' + (y),0);
                             square.classList.add('kill');
                             self.showTextHelper('Компьютер попал, он продолжает');
                             if (shooter.points === 20) {
@@ -205,12 +206,12 @@ window.onload = function() {
                                     self.showTextHelper('Победил компьютер')
                                 return;
                             }
+                            self.deleteDiagonaleCoordinates(x,y);
                             self.getAroundCoordinates(x,y);
                             setTimeout(function() {
                                 return self.shot();
                             }, 500);
                         }
-
 
                         break;
                 }
@@ -266,8 +267,6 @@ window.onload = function() {
                 // перемешиваем матрицы
                 ai.allCoordinates.sort(compareRandom);
                 ai.optimalCoordinates.sort(compareRandom);
-
-                return;
             },
             getAiCoordinates: function () {
                 // первым делом просматриваем координаты вокруг попадания,
@@ -283,7 +282,7 @@ window.onload = function() {
                 var obj = {
                     x: x,
                     y: y
-                }
+                };
 
                 self.deleteExtraCoordinates(ai.optimalCoordinates, obj)
 
@@ -294,36 +293,41 @@ window.onload = function() {
             getAroundCoordinates: function (x,y) {
                 // собираем координаты в которых может находиться продолжение корабля
                 var around = filterCoordinates([[x+1,y], [x-1,y], [x, y+1], [x, y-1]]);
-                // одновременно удаляем из всех матриц диагональные координаты,
+                // оставляем в соседних координатах только те в которых может находиться корабль
+                if (shooter === ai)
+                shooter.aroundCoordinates = [...shooter.aroundCoordinates, ...around].filter(i =>
+                    enemy.fieldMatrix[i[0]][i[1]] === 0 || enemy.fieldMatrix[i[0]][i[1]] === 1);
+            },
+            deleteDiagonaleCoordinates: function(x,y) {
+                // удаляем из всех матриц диагональные координаты,
                 // в которых точно не может находиться палуба и отмечаем эти клетки как проверенные
+                // (когда бьет пользователь соответственно не нужно работать ни с какими массивами)
                 var diag = filterCoordinates([[x+1,y+1], [x-1,y-1], [x-1, y+1], [x+1, y-1]]);
                 diag.forEach(i => {
-                    self.deleteExtraCoordinates(ai.optimalCoordinates,
-                        {
-                            x: i[0],
-                            y: i[1]
-                        }
-                    );
-                    self.deleteExtraCoordinates(ai.allCoordinates,
-                        {
-                            x: i[0],
-                            y: i[1]
-                        }
-                    );
-                    user.fieldMatrix[i[0]][i[1]] = 2;
-                    var square = getElementByClass((i[0]) + '-' + (i[1]));
+                    if (shooter === ai) {
+                        self.deleteExtraCoordinates(ai.optimalCoordinates,
+                            {
+                                x: i[0],
+                                y: i[1]
+                            }
+                        );
+                        self.deleteExtraCoordinates(ai.allCoordinates,
+                            {
+                                x: i[0],
+                                y: i[1]
+                            }
+                        );}
+                    enemy.fieldMatrix[i[0]][i[1]] = 2;
+                    var square = getElementByClass((i[0]) + '-' + (i[1]), (shooter === user) ? 1 : 0);
                     square.classList.add('mistake');
                 })
-                // оставляем в соседних координатах только те в которых может находиться корабль
-                ai.aroundCoordinates = [...ai.aroundCoordinates, ...around].filter(i =>
-                    user.fieldMatrix[i[0]][i[1]] === 0 || user.fieldMatrix[i[0]][i[1]] === 1);
             },
             deleteExtraCoordinates: function (arr, obj) {
-                for (var i = 0, lh = arr.length; i < lh; i++) {
+                for (var coord = 0; coord < arr.length; coord++) {
                     // находим ячейку массива, в которой содержатся координата
                     // равная координате выстрела и удаляем эту ячейку
-                    if (arr[i][0] === obj.x && arr[i][1] === obj.y) {
-                        arr.splice(i, 1);
+                    if (arr[coord][0] === obj.x && arr[coord][1] === obj.y) {
+                        arr.splice(coord, 1);
                         break;
                     }
                 }
@@ -363,11 +367,14 @@ window.onload = function() {
         return document.getElementById(id);
     }
 
-    function getElementByClass(name) {
-        return document.getElementsByClassName(name)[0];
+    function getElementByClass(name, position) {
+        // не лучшее решение, position нужен чтобы определить к какому полю относится требуемый элемент
+        // поскольку и у поля юзера и у поля компьютера нумерация ячеек одинаковая
+        return document.getElementsByClassName(name)[position];
     }
 
     function createPureField(name) {
+        // создаем пустое поле 10х10
         var x = 10, y = 10, arr = [10];
         for (var i = 0; i < x; i++) {
             arr[i] = [10];
@@ -386,7 +393,7 @@ window.onload = function() {
 
     function filterCoordinates(arr) {
         // вспомогательная функция убирающая координаты вышедшие за пределы игрового поля
-        return arr.filter(i => i[0] >=0 && i[0] < 10 && i[1] >= 0 && i[1] < 10);
+        return arr.filter(coord => coord[0] >=0 && coord[0] < 10 && coord[1] >= 0 && coord[1] < 10);
     }
 
     function getRandom(n) {
