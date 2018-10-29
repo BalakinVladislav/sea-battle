@@ -1,3 +1,23 @@
+function addEvent(evnt, elem, func) {
+    if (elem.addEventListener)  // W3C DOM
+        elem.addEventListener(evnt,func,false);
+    else if (elem.attachEvent) { // IE DOM
+        elem.attachEvent("on"+evnt, func);
+    }
+    else { // No much to do
+        elem[evnt] = func;
+    }
+}
+function deleteEvent(evnt, elem, func) {
+    if (elem.removeEventListener)  // W3C DOM
+        elem.removeEventListener(evnt,func);
+    else if (elem.detachEvent) { // IE DOM
+        elem.detachEvent("on"+evnt, func);
+    }
+    else { // No much to do
+        elem[evnt] = func;
+    }
+}
 window.onload = function() {
     function Battlefield(field) {
             this.shipsData	= [
@@ -133,7 +153,7 @@ window.onload = function() {
 
                 if (shooter === user) {
                     self.showTextHelper('Ваш выстрел');
-                    aiField.addEventListener('click', self.shot)
+                    addEvent('click', aiField, self.shot);
                 } else {
                     self.showTextHelper('Выстрел компьютера');
                     self.shot();
@@ -147,7 +167,9 @@ window.onload = function() {
                 } else {
                     coordinates = self.getAiCoordinates();
                 }
-                [x, y] = coordinates;
+                x = coordinates[0];
+                y = coordinates[1];
+                // [x, y] = coordinates;
                 // получаем значение по координатам выстрела
                 var fieldValue = enemy.fieldMatrix[x][y];
 
@@ -168,7 +190,8 @@ window.onload = function() {
                             // следующий выстрел будет делать компьютер,
                             // поэтому убираем возможность выстрелить игроку и инициируем выстрел компьютера
                             e.target.classList.add('mistake');
-                            aiField.removeEventListener('click', self.shot)
+                            deleteEvent('click', aiField, self.shot)
+                            //aiField.removeEventListener('click', self.shot)
                             setTimeout(function() {
                                 return self.shot();
                             }, 500);
@@ -176,7 +199,7 @@ window.onload = function() {
                             // следующий выстрел делает игрок, добавляем возможность совершить выстрел
                             var square = getElementByClass((x) + '-' + (y),0);
                             square.classList.add('mistake');
-                            aiField.addEventListener('click', self.shot)
+                            addEvent('click', aiField, self.shot);
                         }
                         break;
 
@@ -339,23 +362,23 @@ window.onload = function() {
         }
         return {methods: methods}
     }())
-
-    getElement('randomed-ships').addEventListener('click', function() {
+    var shipsRandomizer = getElement('randomed-ships');
+    var startGame = getElement('start-game');
+    var newGame = getElement('new-game');
+    addEvent('click', shipsRandomizer, function() {
         user.cleanField('user-field');
         user.placeShips();
     });
-
-    getElement('start-game').addEventListener('click', function() {
+    addEvent('click', startGame, function() {
         if (user.fieldMatrix) {
-        getElement('start-game').style.display = 'none';
-        getElement('randomed-ships').style.display = 'none';
-        Game.methods.start();
+            getElement('start-game').style.display = 'none';
+            getElement('randomed-ships').style.display = 'none';
+            Game.methods.start();
         } else {
             Game.methods.showTextHelper('Расставьте корабли!')
         }
-    });
-
-    getElement('new-game').addEventListener('click', function () {
+    })
+    addEvent('click', newGame, function () {
         user.cleanField('user-field');
         ai.cleanField('ai-field');
         getElement('start-game').style.display = 'inline-block';
